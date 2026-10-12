@@ -12,19 +12,9 @@ public class FishingGambling {
     public FishingGambling() {
         fishedItems = new ArrayList<>();
         players = new ArrayList<>();
-        trashItemNames = new ArrayList<>();
-        trashItemNames.add("Raw Salmon");
-        trashItemNames.add("Raw Cod");
-        trashItemNames.add("Tropical Fish");
-        treasureItemNames = new ArrayList<>();
-        treasureItemNames.add("Saddle");
-        treasureItemNames.add("Name Tag");
-        treasureItemNames.add("Pufferfish");
-        treasureItemNames.add("Nautilus Shell");
-        enchantedItemNames = new ArrayList<>();
-        enchantedItemNames.add("Bow");
-        enchantedItemNames.add("Fishing Rod");
-        enchantedItemNames.add("Enchanted Book");
+        trashItemNames = ConfigManager.getItemsFromFile(ConfigManager.trashItemsPath);
+        treasureItemNames = ConfigManager.getItemsFromFile(ConfigManager.treasureItemsPath);
+        enchantedItemNames = ConfigManager.getItemsFromFile(ConfigManager.enchantedItemsPath);
     }
 
     public void addPlayer() {
@@ -47,6 +37,8 @@ public class FishingGambling {
                         IO.readln("How many enchants does the item have (put 0 if the item has a curse): "));
                 fishedItems.add(new EnchantedItem(itemName, enchantCount));
                 break;
+            } else if (itemName.equals("Interference")) {
+                throw new RuntimeException(Main.interferenceMessage);
             } else {
                 IO.println("Invalid input... Please try again.");
             }
