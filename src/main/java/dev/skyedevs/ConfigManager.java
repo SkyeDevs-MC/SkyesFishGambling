@@ -17,8 +17,8 @@ public class ConfigManager {
 
     public static void createPaths() {
         try {
-            List<String> defaultTrash = List.of("Raw Cod", "Raw Salmon", "Tropical Fish");
-            List<String> defaultTreasure = List.of("Saddle", "Name Tag", "Pufferfish", "Nautilus Shell");
+            List<String> defaultTrash = List.of("Raw Cod", "Tropical Fish", "Saddle", "Pufferfish");
+            List<String> defaultTreasure = List.of("Raw Salmon", "Name Tag", "Nautilus Shell");
             List<String> defaultEnchanted = List.of("Enchanted Book", "Bow", "Fishing Rod");
 
             createFileWithDefaults(trashItemsPath, defaultTrash);
