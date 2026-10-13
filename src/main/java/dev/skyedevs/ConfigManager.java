@@ -3,8 +3,6 @@ package dev.skyedevs;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +27,6 @@ public class ConfigManager {
 
         } catch (IOException e) {
             System.err.println("Failed to initialize FishGambling configuration files!");
-            e.printStackTrace();
         }
     }
 
@@ -44,8 +41,6 @@ public class ConfigManager {
     }
 
     public static HashSet<String> getItemsFromFile(Path itemFilePath) {
-        HashSet<String> items = new HashSet<>();
-
         try (Stream<String> lines = Files.lines(itemFilePath)) {
             return lines.collect(Collectors.toCollection(HashSet::new));
         } catch (Exception e) {
