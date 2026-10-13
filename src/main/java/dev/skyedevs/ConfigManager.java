@@ -5,38 +5,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConfigManager {
-    public static final Path trashItemsPath = (getUserConfigFolder("FishGambling/trashItems.txt"));
-    public static final Path treasureItemsPath = (getUserConfigFolder("FishGambling/treasureItems.txt"));
-    public static final Path enchantedItemsPath = (getUserConfigFolder("FishGambling/enchantedItems.txt"));
-
-    private static Path getUserConfigFolder(String appName) {
-        String os = System.getProperty("os.name").toLowerCase();
-        Path configPath;
-
-        if (os.contains("win")) {
-            String appData = System.getenv("APPDATA");
-            if (appData != null) {
-                configPath = Paths.get(appData);
-            } else {
-                configPath = Paths.get(System.getProperty("user.home"), "AppData", "Roaming");
-            }
-        } else if (os.contains("mac")) {
-            configPath = Paths.get(System.getProperty("user.home"), "Library", "Application Support");
-        } else {
-            String xdgConfig = System.getenv("XDG_CONFIG_HOME");
-            if (xdgConfig != null && !xdgConfig.isEmpty()) {
-                configPath = Paths.get(xdgConfig);
-            } else {
-                configPath = Paths.get(System.getProperty("user.home"), ".config");
-            }
-        }
-
-        return configPath.resolve(appName);
-    }
+    public static final Path trashItemsPath = Utils.getUserConfigFolder("FishGambling/itemConfig/trashItems.txt");
+    public static final Path treasureItemsPath = 
+            Utils.getUserConfigFolder("FishGambling/itemConfig/treasureItems.txt");
+    public static final Path enchantedItemsPath = 
+            Utils.getUserConfigFolder("FishGambling/itemConfig/enchantedItems.txt");
 
     public static void createPaths() {
         try {
@@ -64,16 +43,14 @@ public class ConfigManager {
         }
     }
 
-    public static ArrayList<String> getItemsFromFile(Path itemFilePath) {
-        ArrayList<String> trashItems = new ArrayList<>();
+    public static HashSet<String> getItemsFromFile(Path itemFilePath) {
+        HashSet<String> items = new HashSet<>();
 
         try (Stream<String> lines = Files.lines(itemFilePath)) {
-            lines.forEach(trashItems::add);
+            return lines.collect(Collectors.toCollection(HashSet::new));
         } catch (Exception e) {
             System.err.println("Error reading file: " + e.getMessage());
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
-
-        return trashItems;
     }
 }

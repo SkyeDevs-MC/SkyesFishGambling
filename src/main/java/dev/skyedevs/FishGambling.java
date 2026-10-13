@@ -1,15 +1,16 @@
 package dev.skyedevs;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
-public class FishingGambling {
+public class FishGambling {
     private final ArrayList<FishedItem> fishedItems;
     private final ArrayList<Player> players;
-    private final ArrayList<String> trashItemNames;
-    private final ArrayList<String> treasureItemNames;
-    private final ArrayList<String> enchantedItemNames;
+    private final HashSet<String> trashItemNames;
+    private final HashSet<String> treasureItemNames;
+    private final HashSet<String> enchantedItemNames;
 
-    public FishingGambling() {
+    public FishGambling() {
         fishedItems = new ArrayList<>();
         players = new ArrayList<>();
         trashItemNames = ConfigManager.getItemsFromFile(ConfigManager.trashItemsPath);
@@ -27,18 +28,18 @@ public class FishingGambling {
         while (true) {
             String itemName = IO.readln("Enter the name of the item (capitalize each word): ");
             if (trashItemNames.contains(itemName)) {
-                fishedItems.add(new TrashItem(itemName));
+                fishedItems.add(new FishedItem(itemName, -0.2));
                 break;
             } else if (treasureItemNames.contains(itemName)) {
-                fishedItems.add(new TreasureItem(itemName));
+                fishedItems.add(new FishedItem(itemName, 0.2));
                 break;
             } else if (enchantedItemNames.contains(itemName)) {
                 int enchantCount = Integer.parseInt(
                         IO.readln("How many enchants does the item have (put 0 if the item has a curse): "));
-                fishedItems.add(new EnchantedItem(itemName, enchantCount));
+                fishedItems.add(new FishedItem(itemName, enchantCount));
                 break;
             } else if (itemName.equals("Interference")) {
-                throw new RuntimeException(Main.interferenceMessage);
+                throw new RuntimeException(Utils.interferenceMessage);
             } else {
                 IO.println("Invalid input... Please try again.");
             }
@@ -55,10 +56,10 @@ public class FishingGambling {
             }
         }
 
-        return Main.getCorrectRounding(multiplier);
+        return Utils.getCorrectRounding(multiplier);
     }
 
-    public boolean isAllSameItem() {
+    private boolean isAllSameItem() {
         if (getMultiplier() == 0.0) {
             boolean sameName = true;
             String name = fishedItems.getFirst().toString();
@@ -75,7 +76,17 @@ public class FishingGambling {
         return false;
     }
 
-    public String getPayCommands() {
+    private double calculateTotalBet() {
+        double totalBet = 0.0;
+        double multiplier = getMultiplier();
+        for (Player player : players) {
+            totalBet += player.getInitialBet();
+        }
+
+        return Utils.getCorrectRounding(totalBet * multiplier, 2);
+    }
+
+    public String getPayCommands(boolean usingGroupPool) {
         StringBuilder commands = new StringBuilder();
         double multiplier = getMultiplier();
         if (multiplier == 0.0) {
@@ -88,17 +99,26 @@ public class FishingGambling {
         }
 
         if (commands.isEmpty()) {
-            double totalMoney = 0.0;
-            for (Player player : players) {
-                totalMoney += Main.getCorrectRounding(player.getInitialBet() * multiplier, 2);
-            }
-            for (Player player : players) {
-                commands.append("/pay ")
-                        .append(player.getUsername())
-                        .append(" ")
-                        .append(Main.getCorrectRounding(totalMoney / players.size(), 2));
-                if (player != players.getLast()) {
-                    commands.append('\n');
+            if (usingGroupPool) {
+                double totalMoney = calculateTotalBet();
+                for (Player player : players) {
+                    commands.append("/pay ")
+                            .append(player.getUsername())
+                            .append(" ")
+                            .append(Utils.getCorrectRounding(totalMoney / players.size(), 2));
+                    if (player != players.getLast()) {
+                        commands.append('\n');
+                    }
+                }
+            } else {
+                for (Player player : players) {
+                    commands.append("/pay ")
+                            .append(player.getUsername())
+                            .append(" ")
+                            .append(Utils.getCorrectRounding(player.getInitialBet() * multiplier, 2));
+                    if (player != players.getLast()) {
+                        commands.append('\n');
+                    }
                 }
             }
         }

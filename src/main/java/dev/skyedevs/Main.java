@@ -1,50 +1,39 @@
 package dev.skyedevs;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.Objects;
 
 public class Main {
-    public static final String interferenceMessage = "\nGame ended with interference, no one gets any money...";
-
-    public static double getCorrectRounding(double doubleToRound) {
-        BigDecimal bd = new BigDecimal(Double.toString(doubleToRound));
-        bd = bd.setScale(1, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
-
-    public static double getCorrectRounding(double doubleToRound, int roundToPlace) {
-        BigDecimal bd = new BigDecimal(Double.toString(doubleToRound));
-        bd = bd.setScale(roundToPlace, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
-
     static void main() {
         ConfigManager.createPaths();
 
         while (true) {
-            FishingGambling fishingGambling = new FishingGambling();
+            FishGambling game = new FishGambling();
             int castCount = 10;
             int playerCount = Integer.parseInt(IO.readln("Enter the number of players: "));
+            boolean usingGroupPool = false;
+            if (playerCount > 1) {
+                usingGroupPool = Objects.equals(IO.readln("Would players like to use group bet (y/N): "), "y");
+            }
             IO.println();
             for (int i = 1; i <= playerCount; i++) {
                 IO.println("Player " + i + ":");
-                fishingGambling.addPlayer();
+                game.addPlayer();
                 IO.println();
             }
 
             try {
                 for (int i = 1; i <= castCount; i++) {
                     IO.println("Cast " + i + ":");
-                    IO.println("Current Multiplier: " + fishingGambling.getMultiplier() + "x");
-                    fishingGambling.addFishedItem();
+                    IO.println("Current Multiplier: " + game.getMultiplier() + "x");
+                    game.addFishedItem();
                     IO.println();
                 }
 
-                IO.println("Final Multiplier: " + fishingGambling.getMultiplier() + "x");
-                IO.println(fishingGambling.getPayCommands());
+                IO.println("Final Multiplier: " + game.getMultiplier() + "x");
+                IO.println(game.getPayCommands(usingGroupPool));
             } catch (Exception e) {
-                if (e.getMessage().equals(interferenceMessage)) {
-                    IO.println(e.getMessage());
+                if (e.getMessage().equals(Utils.interferenceMessage)) {
+                    IO.println('\n' + e.getMessage());
                 } else {
                     System.exit(1);
                 }

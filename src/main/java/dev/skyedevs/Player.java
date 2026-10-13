@@ -14,7 +14,7 @@ public class Player {
     }
 
     double getInitialBet() {
-        return Main.getCorrectRounding(initialBet, 2);
+        return Utils.getCorrectRounding(initialBet, 2);
     }
 
     public String toString() {
