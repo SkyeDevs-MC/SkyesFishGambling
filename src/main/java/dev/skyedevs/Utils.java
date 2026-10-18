@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 
 public class Utils {
     public static final String interferenceMessage = "Game ended with interference, no one gets any money...";
@@ -82,10 +81,10 @@ public class Utils {
 
     private static final char[] SUFFIXES = {'k', 'm', 'b', 't'};
     private static final double[] THRESHOLDS = {
-            1_000.0,            // k
-            1_000_000.0,        // m
-            1_000_000_000.0,    // b
-            1_000_000_000_000.0 // t
+            1_000.0,
+            1_000_000.0,
+            1_000_000_000.0,
+            1_000_000_000_000.0
     };
 
     public static String formatNumber(double value) {
@@ -96,7 +95,6 @@ public class Utils {
         int unitIndex = -1;
         double scaledValue = value;
 
-        // Find the appropriate tier
         for (int i = 0; i < THRESHOLDS.length; i++) {
             if (Math.abs(value) >= THRESHOLDS[i]) {
                 unitIndex = i;
@@ -104,7 +102,6 @@ public class Utils {
             }
         }
 
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(scaledValue) + SUFFIXES[unitIndex];
+        return scaledValue + String.valueOf(SUFFIXES[unitIndex]);
     }
 }
