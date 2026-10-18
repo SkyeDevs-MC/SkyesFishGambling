@@ -1,7 +1,5 @@
 package dev.skyedevs;
 
-import java.util.Objects;
-
 public class Main {
     static void main() {
         ConfigManager.createPaths();
@@ -9,15 +7,25 @@ public class Main {
         while (true) {
             FishGambling game = new FishGambling();
             int castCount = 10;
-            int playerCount = Integer.parseInt(IO.readln("Enter the number of players: "));
+            int playerCount = 0;
             boolean usingGroupPool = false;
-            if (playerCount > 1) {
-                usingGroupPool = Objects.equals(IO.readln("Would players like to use group bet (y/N): "), "y");
-            }
-            IO.println();
-            for (int i = 1; i <= playerCount; i++) {
-                IO.println("Player " + i + ":");
-                game.addPlayer();
+            while (true) {
+                IO.println("Player " + (playerCount + 1) + ":");
+                String name;
+                while (true) {
+                    name = IO.readln("Enter the player's username (empty exits): ");
+                    if (name.isEmpty() && playerCount == 0) {
+                        IO.println("You have not entered a player. Please enter a player.");
+                    } else {
+                        break;
+                    }
+                }
+                if (name.isEmpty()) {
+                    break;
+                }
+                double initialBet = Utils.parseFormattedNumber(IO.readln("Enter the player's initial bet: "));
+                game.addPlayer(new Player(name, initialBet));
+                playerCount++;
                 IO.println();
             }
 

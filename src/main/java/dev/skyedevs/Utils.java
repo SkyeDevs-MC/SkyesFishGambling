@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 
 public class Utils {
     public static final String interferenceMessage = "Game ended with interference, no one gets any money...";
@@ -43,5 +44,67 @@ public class Utils {
         }
 
         return configPath.resolve(appName);
+    }
+
+    public static double parseFormattedNumber(String input) {
+        if (input == null || input.isBlank()) {
+            throw new IllegalArgumentException("Input cannot be null or blank");
+        }
+
+        String trimmed = input.trim().toLowerCase();
+        char lastChar = trimmed.charAt(trimmed.length() - 1);
+
+        double multiplier = 1.0;
+        int endIndex = trimmed.length();
+
+        switch (lastChar) {
+            case 'k':
+                multiplier = 1_000.0;
+                endIndex--;
+                break;
+            case 'm':
+                multiplier = 1_000_000.0;
+                endIndex--;
+                break;
+            case 'b':
+                multiplier = 1_000_000_000.0;
+                endIndex--;
+                break;
+            default:
+                break;
+        }
+
+        String numericPart = trimmed.substring(0, endIndex);
+        double baseValue = Double.parseDouble(numericPart);
+
+        return baseValue * multiplier;
+    }
+
+    private static final char[] SUFFIXES = {'k', 'm', 'b', 't'};
+    private static final double[] THRESHOLDS = {
+            1_000.0,            // k
+            1_000_000.0,        // m
+            1_000_000_000.0,    // b
+            1_000_000_000_000.0 // t
+    };
+
+    public static String formatNumber(double value) {
+        if (Math.abs(value) < 1000.0) {
+            return String.valueOf(value);
+        }
+
+        int unitIndex = -1;
+        double scaledValue = value;
+
+        // Find the appropriate tier
+        for (int i = 0; i < THRESHOLDS.length; i++) {
+            if (Math.abs(value) >= THRESHOLDS[i]) {
+                unitIndex = i;
+                scaledValue = value / THRESHOLDS[i];
+            }
+        }
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(scaledValue) + SUFFIXES[unitIndex];
     }
 }

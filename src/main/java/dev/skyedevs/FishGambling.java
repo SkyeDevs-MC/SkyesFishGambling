@@ -18,10 +18,8 @@ public class FishGambling {
         enchantedItemNames = ConfigManager.getItemsFromFile(ConfigManager.enchantedItemsPath);
     }
 
-    public void addPlayer() {
-        String username = IO.readln("Enter the player's username: ");
-        double initialBet = Double.parseDouble(IO.readln("Enter the player's initial bet: "));
-        players.add(new Player(username, initialBet));
+    public void addPlayer(Player player) {
+        players.add(player);
     }
 
     public void addFishedItem() {
@@ -115,7 +113,7 @@ public class FishGambling {
                     commands.append("/pay ")
                             .append(player.getUsername())
                             .append(" ")
-                            .append(Utils.getCorrectRounding(player.getInitialBet() * multiplier, 2));
+                            .append(Utils.formatNumber(Utils.getCorrectRounding(player.getInitialBet() * multiplier, 2)));
                     if (player != players.getLast()) {
                         commands.append('\n');
                     }
